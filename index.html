@@ -260,6 +260,7 @@ function update()
 		// compile data into a text string that will be sent to the data server (and stored in a file, e.g.)
 		var data_text = [];
 		data_text.push(["SUBJECT", "AGE", "SIGNAL_FRACTION", "DIRECTION", "RESPONSE", "CORRECT", "RT"].join("\t"));
+		data_text = data_text.join("\n");
 		for(var i = 0; i < trials.length; i++) {
 			var tr = trials[i];
 			data_text.push([subj_info.subject, subj_info.age, tr.signal_fraction, tr.direction,
@@ -276,7 +277,8 @@ function update()
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.open("POST", "/oeil/json.php");
 		xmlhttp.setRequestHeader("Content-Type", "application/json");
-		xmlhttp.send(JSON.stringify({"subj_info" : subj_info, "trials" : trials}));
+		xmlhttp.send(data_text);
+		// xmlhttp.send(JSON.stringify({"subj_info" : subj_info, "trials" : trials}));
 
 		document.exitFullscreen();
 		keep_going = false;
