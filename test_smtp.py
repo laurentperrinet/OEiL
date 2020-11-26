@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 DATA_DIR = './data'             # the directory in which to put the data file
 SUFFIX = 'dat'
 EMAIL_FROM = 'Laurent Perrinet <laurent@spik.xyz>'
-EMAIL_SMTP = 'spik.xyz'
+EMAIL_SMTP = 'localhost'
 
 fs = 'hello world'
 email = 'laurent.perrinet@univ-amu.fr'
