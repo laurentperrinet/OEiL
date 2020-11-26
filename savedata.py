@@ -42,37 +42,38 @@ now = dt.strftime('%Y-%m-%d-%H-%M-%S') + '-' + ('%03d' % millis)
 fs = cgi.FieldStorage()         # get the data field
 data = fs.getfirst('data')
 
-os.chdir(DATA_DIR)              # get the next unused name for a data file
-file_names = os.listdir('.')    # order is 0001.dat, 0002.dat, etc.
-existing = []
-for file_name in file_names:
-    m = re.match(r'^([0-9]+)\.' + SUFFIX + r'$', file_name)
-    if m:
-        existing.append(int(m.group(1)))
-if existing:
-    n = max(existing) + 1
-else:
-    n = 1
-data_fn = '%04d.%s' % (n, SUFFIX)
+if False:
+	os.chdir(DATA_DIR)              # get the next unused name for a data file
+	file_names = os.listdir('.')    # order is 0001.dat, 0002.dat, etc.
+	existing = []
+	for file_name in file_names:
+	    m = re.match(r'^([0-9]+)\.' + SUFFIX + r'$', file_name)
+	    if m:
+	        existing.append(int(m.group(1)))
+	if existing:
+	    n = max(existing) + 1
+	else:
+	    n = 1
+	data_fn = '%04d.%s' % (n, SUFFIX)
 
-fp = open(data_fn, 'wt')        # save the data
-fp.write('# ' + now + '\n')     # first the date and time as a comment
-fp.write(data)                  # then the contents of the data field
-fp.close()
+	fp = open(data_fn, 'wt')        # save the data
+	fp.write('# ' + now + '\n')     # first the date and time as a comment
+	fp.write(data)                  # then the contents of the data field
+	fp.close()
 
 # send the data by email, if we got an email address
 email = 'laurent.perrinet@univ-amu.fr'
 #if 'email' in fs:
 #    email = fs.getfirst('email').strip()
-if True:
-    if True: #if email:
-        msg = MIMEText(data)
-        msg['Subject'] = 'data from on-line experiment'
-        msg['From'] = EMAIL_FROM
-        msg['To'] = email
-        s = smtplib.SMTP(EMAIL_SMTP)
-        s.sendmail(EMAIL_FROM, [email], msg.as_string())
-        s.quit()
+# if True:
+#     if True: #if email:
+msg = MIMEText(data)
+msg['Subject'] = 'data from on-line experiment'
+msg['From'] = EMAIL_FROM
+msg['To'] = email
+s = smtplib.SMTP(EMAIL_SMTP)
+s.sendmail(EMAIL_FROM, [email], msg.as_string())
+s.quit()
 
 import sys
 sys.write.stdout('some text')
