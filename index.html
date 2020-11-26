@@ -296,8 +296,8 @@ function update()
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.open("POST", "/oeil/json.php");
 		xmlhttp.setRequestHeader("Content-Type", "application/json");
-		xmlhttp.send(JSON.stringify(request_text));
-	
+		xmlhttp.send(JSON.stringify(data_text));
+
 		document.exitFullscreen();
 		keep_going = false;
 	}
