@@ -1,19 +1,33 @@
+<!DOCTYPE html>
 <html>
+
 <head>
-<script>
-const fs = require('fs');
-const path = require('path');
+  <title>Send Mail</title>
+  <script src=
+    "https://smtpjs.com/v3/smtp.js">
+  </script>
 
-let student = {
-    name: 'Mike',
-    age: 23,
-    gender: 'Male',
-    department: 'English',
-    car: 'Honda'
-};
-
-fs.writeFileSync('./student.json', JSON.stringify(student));
-</script>
+  <script type="text/javascript">
+    function sendEmail() {
+      Email.send({
+        Host: "spik.xyz",
+        To: 'laurent.perrinet@univ-amu.fr',
+        From: "laurent@spik.xyz",
+        Subject: "Sending Email using javascript",
+        Body: "Well that was easy!!",
+      })
+        .then(function (message) {
+          alert("mail sent successfully")
+        });
+    }
+  </script>
 </head>
-<body></body>
+
+<body>
+  <form method="post">
+    <input type="button" value="Send Email"
+        onclick="sendEmail()" />
+  </form>
+</body>
+
 </html>
