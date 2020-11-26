@@ -149,17 +149,6 @@ function update()
 		tbody.appendChild(tr);
 
 		tr = document.createElement("tr");
-		td = document.createElement("td");
-		td.appendChild(document.createTextNode("Email address to send the data (or blank):"));
-		td.style.textAlign = "right";
-		tr.appendChild(td);
-		td = document.createElement("td");
-		input_email = document.createElement("input");
-		td.appendChild(input_email);
-		tr.appendChild(td);
-		tbody.appendChild(tr);
-
-		tr = document.createElement("tr");
 		tr.appendChild(document.createElement("td"));
 		td = document.createElement("td");
 		var start_button = document.createElement("button");
@@ -177,7 +166,7 @@ function update()
 		subj_info = {};
 		subj_info.subject = input_subj.value;
 		subj_info.age = input_age.value;
-		subj_info.email = input_email.value;
+		subj_info.time = get_time(); // get  date
 		document.body.removeChild(form_table);
 		document.documentElement.requestFullscreen();
 
