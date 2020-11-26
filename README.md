@@ -1,2 +1,1 @@
-# OEiL
-Online Experiments for Interweb Laboratories
+# oeil: Online Experiments for Interweb Laboratories
