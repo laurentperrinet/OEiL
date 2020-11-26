@@ -42,6 +42,14 @@ now = dt.strftime('%Y-%m-%d-%H-%M-%S') + '-' + ('%03d' % millis)
 fs = cgi.FieldStorage()         # get the data field
 data = fs.getfirst('data')
 
+
+with open('testw.dat', 'w') as fp:       # save the data
+	fp.write('# ' + now + '\n')     # first the date and time as a comment
+
+
+with open('test.dat', 'wt') as fp:       # save the data
+	fp.write('# ' + now + '\n')     # first the date and time as a comment
+
 if False:
 	os.chdir(DATA_DIR)              # get the next unused name for a data file
 	file_names = os.listdir('.')    # order is 0001.dat, 0002.dat, etc.
