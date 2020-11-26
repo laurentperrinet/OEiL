@@ -1,7 +1,7 @@
 <?php
 debug_to_console("test");
 $json = file_get_contents('php://input');
-file_put_contents('file.json', $json);
+file_put_contents('file.json', $json, FILE_APPEND);
 
 function debug_to_console($data) {
    $output = $data;
