@@ -23,7 +23,6 @@ pause_duration = 0.5;	// seconds
 stimulus_color = "rgb(0, 0, 0)";
 fp_color = "rgb(255, 0, 0)";
 frame_rate = 60;		// assumed frame rate for distance calculation
-data_server = "https://spik.xyz/oeil/savedata.py";
 
 function get_time()
 {
@@ -279,15 +278,16 @@ function update()
 		}
 		data_text = data_text.join("\n");
 		console.log(data_text);			// dump data to console for debugging purposes
-		instruction_text.innerHTML = "<b>SENDING DATA TO " + data_server + "<b>";
+		instruction_text.innerHTML = "<b>Saved the data<b>";
 		data_display_text.innerHTML = "Data sent:<br><pre>" + data_text + "</pre>";
+
 		var request_text = "data=" + encodeURIComponent(data_text) + "&email=" + encodeURIComponent(subj_info.email);
 
 
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.open("POST", "/oeil/json.php");
 		xmlhttp.setRequestHeader("Content-Type", "application/json");
-		xmlhttp.send(JSON.stringify(data_text));
+		xmlhttp.send(JSON.stringify(trials));
 
 		document.exitFullscreen();
 		keep_going = false;
@@ -295,22 +295,6 @@ function update()
 	if(keep_going)
 		requestAnimationFrame(update);	// will call update on next frame (usually)
 }
-
-// this function is called when something happens the HTTP request used to send the data to the server
-// it can be used to make sure that the data actually reaches its destination, and in the rare case that
-// it doesn't, to try again
-// also consider using the ontimeout function
-/*
-function on_request_state_change()
-{
-	if(request.readyState == 4) {
-		if(request.status == 200)
-			instruction_text.innerHTML = "<b>DATA SUCCESSFULLY SENT TO " + data_server + "<b>";
-		else
-			instruction_text.innerHTML = "<b>DATA DID NOT ARRIVE AT " + data_server + "! (status " + request.status + ")<b>";
-	}
-}
-*/
 
 
 </script>
