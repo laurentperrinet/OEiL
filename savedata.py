@@ -32,7 +32,7 @@ from email.mime.text import MIMEText
 
 DATA_DIR = './data'             # the directory in which to put the data file
 SUFFIX = 'dat'
-EMAIL_FROM = 'Mark Wexler <mark@lab-perception.org>'
+EMAIL_FROM = 'Laurent Perrinet <laurent@spik.xyz>'
 EMAIL_SMTP = 'localhost'
 
 dt = datetime.datetime.now()    # get current date and time (put it as a comment at the beginning of the data file)
