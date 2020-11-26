@@ -266,7 +266,7 @@ function update()
 							tr.response, (tr.correct ? 1 : 0), tr.rt].join("\t"));
 		}
 		data_text = data_text.join("\n");
-		data_text = data_text.join("\n");
+		data_text = data_text + "\n" ;
 
 		console.log(data_text);			// dump data to console for debugging purposes
 		instruction_text.innerHTML = "<b>Saved the data<b>";
