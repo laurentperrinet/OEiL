@@ -2,7 +2,7 @@
 
 '''
 Below is a working example of a server-side script, in Python. In our case the script is
-in the file http://lab-perception.org/js/savedata.py. It can be used to receive the data
+in the file https://spik.xyz/OEiL/savedata.py. It can be used to receive the data
 and store it in a file with a unique name (0001.dat, 0002.dat, etc.), together with a date
 and time, and to optionally send the data to an email address. Similar scripts can of course
 be written in PHP or other server scripting languages.
@@ -11,12 +11,12 @@ When testing, don't forget the set permissions (read and execute for the script,
 directory where the data files will go: in our case, ./data). Also make sure that your server
 will execute the script. In my case (Apache 2), I added the following lines the configuration
 file:
-<Directory "/var/www/html/js">
+<Directory "/var/www/html/OEiL">
 	Require all granted
 	Options +ExecCGI
 	AddHandler cgi-script .cgi .py
 </Directory>
-<Directory "/var/www/html/js/data">
+<Directory "/var/www/html/OEiL/data">
 	Require all denied
 </Directory>
 
