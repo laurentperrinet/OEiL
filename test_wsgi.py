@@ -2,15 +2,15 @@
 
 import sys
 
-def application(environ, start_response):
+def application(environ,start_response):
     status = '200 OK'
-    output = b'Hello World!'
-
-    response_headers = [('Content-type', 'text/plain'),
-                        ('Content-Length', str(len(output)))]
-    start_response(status, response_headers)
-
-    print (>> sys.stderr, 'sys.prefix = %s' % repr(sys.prefix))
-    print (>> sys.stderr, 'sys.path = %s' % repr(sys.path))
-
-    return [output]
+    html = 'html>\n' \
+           '<body>\n' \
+           '<div style="width: 100%; font-size: 40px; font-weight: bold; text-align: center;">\n' \
+           'Welcome to mod_wsgi Test Page\n' \
+           '</div>\n' \
+           '</body>\n' \
+           '</html>\n'
+    response_header = [('Content-type','text/html')]
+    start_response(status,response_header)
+    return [html]

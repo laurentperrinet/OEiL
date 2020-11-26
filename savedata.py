@@ -26,6 +26,10 @@ would be an example of Cross-Origin Resource Sharing (CORS), and needs to be han
 (see https://web.dev/cross-origin-resource-sharing/).
 '''
 
+#
+with open('./data/testw.dat', 'w') as fp:       # save the data
+	fp.write('Hello')     # first the date and time as a comment
+
 import cgi, os, datetime, re
 import smtplib
 from email.mime.text import MIMEText
@@ -43,12 +47,8 @@ fs = cgi.FieldStorage()         # get the data field
 data = fs.getfirst('data')
 
 #
-# with open('./data/testw.dat', 'w') as fp:       # save the data
+# with open('./data/test.dat', 'wt') as fp:       # save the data
 # 	fp.write('# ' + now + '\n')     # first the date and time as a comment
-
-
-with open('./data/test.dat', 'wt') as fp:       # save the data
-	fp.write('# ' + now + '\n')     # first the date and time as a comment
 
 if False:
 	os.chdir(DATA_DIR)              # get the next unused name for a data file
