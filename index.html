@@ -1,6 +1,8 @@
 <!doctype html>
 <html>
 <head>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
 <script src="fullscreen.js"></script>
 <script>
 
@@ -280,17 +282,6 @@ function update()
 		instruction_text.innerHTML = "<b>SENDING DATA TO " + data_server + "<b>";
 		data_display_text.innerHTML = "Data sent:<br><pre>" + data_text + "</pre>";
 		var request_text = "data=" + encodeURIComponent(data_text) + "&email=" + encodeURIComponent(subj_info.email);
-		// request = new XMLHttpRequest();	// make request a global variable, so that it can be accessed by the on_request_state_change function
-		// request.open("POST", data_server, true);
-		// request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		// //request.onreadystatechange = on_request_state_change;
-		// request.send(request_text);		// this is the simplest way of sending an HTTP request
-		// 								// however, occasionally internet requests get lost (typically 1%)
-		// 								// the best thing would be to monitor the results of the request,
-		// 								// and to retry if necessary (set onreadystatechange and ontimeout
-		// 								// members to functions that will monitor the request and resubmit
-		// 								// if necessary)
-		// instruction_text.innerHTML = "<b>DATA SENT TO " + data_server + "<b>";
 
 
 		var xmlhttp = new XMLHttpRequest();
