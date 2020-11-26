@@ -74,4 +74,4 @@ if 'email' in fs:
 
 print('Content-Type: text/html')    # you have to send something back
 print('')                           # even if it won't be displayed
-print('ok')
+print('ok computer')
