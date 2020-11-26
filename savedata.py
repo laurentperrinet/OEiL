@@ -65,7 +65,7 @@ email = 'laurent.perrinet@univ-amu.fr'
 #if 'email' in fs:
 #    email = fs.getfirst('email').strip()
 if True:
-    if email:
+    if True: #if email:
         msg = MIMEText(data)
         msg['Subject'] = 'data from on-line experiment'
         msg['From'] = EMAIL_FROM
