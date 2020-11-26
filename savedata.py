@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 '''
 Below is a working example of a server-side script, in Python. In our case the script is
@@ -61,8 +61,10 @@ fp.write(data)                  # then the contents of the data field
 fp.close()
 
 # send the data by email, if we got an email address
-if 'email' in fs:
-    email = fs.getfirst('email').strip()
+email = 'laurent.perrinet@univ-amu.fr'
+#if 'email' in fs:
+#    email = fs.getfirst('email').strip()
+if True:
     if email:
         msg = MIMEText(data)
         msg['Subject'] = 'data from on-line experiment'
