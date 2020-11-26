@@ -42,12 +42,12 @@ now = dt.strftime('%Y-%m-%d-%H-%M-%S') + '-' + ('%03d' % millis)
 fs = cgi.FieldStorage()         # get the data field
 data = fs.getfirst('data')
 
+#
+# with open('./data/testw.dat', 'w') as fp:       # save the data
+# 	fp.write('# ' + now + '\n')     # first the date and time as a comment
 
-with open('testw.dat', 'w') as fp:       # save the data
-	fp.write('# ' + now + '\n')     # first the date and time as a comment
 
-
-with open('test.dat', 'wt') as fp:       # save the data
+with open('./data/test.dat', 'wt') as fp:       # save the data
 	fp.write('# ' + now + '\n')     # first the date and time as a comment
 
 if False:
