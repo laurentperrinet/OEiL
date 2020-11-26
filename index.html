@@ -1,16 +1,6 @@
-<!--
-Like rdk5, except asks for subject name, age, and an optional email address.
-It sends the data as an invisible HTTP request to a server, which may do anything
-it wants with it (save in a file, send it by email, etc.).
-In a comment after the JS code, I give an example of a Python server script that
-stores the data in a file, and sends it by email if an address was provided.
-Need to have fullscreen.js in the same directory
--->
 <html>
 <head>
-
 <script src="fullscreen.js"></script>
-
 <script>
 
 // uses a reference frame in which the origin is at the center, height is 2 (positive is up),
@@ -21,7 +11,7 @@ height_pix = 500;
 stimulus_duration = 0.5;	// seconds
 n_dots = 100;
 signal_fractions = [0.2, 0.4];
-n_repetitions = 10;
+n_repetitions = 3;
 speed = 0.05;			// distance units/sec, where 2 distance units = stimulus height, and frame rate assumed to be 60 Hz
 lifetime_frames = 12;	// in refresh calls, where usually 1 refresh call = 1 monitor refresh
 dot_radius = 0.01;		// distance units

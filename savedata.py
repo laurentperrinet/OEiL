@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 Below is a working example of a server-side script, in Python. In our case the script is
