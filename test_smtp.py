@@ -10,11 +10,11 @@ EMAIL_FROM = 'Laurent Perrinet <laurent@spik.xyz>'
 EMAIL_SMTP = 'spik.xyz'
 
 fs = 'hello world'
-
+email = 'laurent.perrinet@univ-amu.fr'
 msg = MIMEText(fs)
 msg['Subject'] = 'data from on-line experiment'
 msg['From'] = EMAIL_FROM
-msg['To'] = 'laurent.perrinet@univ-amu.fr'
+msg['To'] = email
 
 print(msg)
 s = smtplib.SMTP(EMAIL_SMTP)
