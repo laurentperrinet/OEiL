@@ -50,7 +50,7 @@ data = fs.getfirst('data')
 # with open('./data/test.dat', 'wt') as fp:       # save the data
 # 	fp.write('# ' + now + '\n')     # first the date and time as a comment
 
-if False:
+if True:
 	os.chdir(DATA_DIR)              # get the next unused name for a data file
 	file_names = os.listdir('.')    # order is 0001.dat, 0002.dat, etc.
 	existing = []
@@ -71,17 +71,16 @@ if False:
 
 # send the data by email, if we got an email address
 email = 'laurent.perrinet@univ-amu.fr'
-#if 'email' in fs:
-#    email = fs.getfirst('email').strip()
-# if True:
-#     if True: #if email:
-msg = MIMEText(data)
-msg['Subject'] = 'data from on-line experiment'
-msg['From'] = EMAIL_FROM
-msg['To'] = email
-s = smtplib.SMTP(EMAIL_SMTP)
-s.sendmail(EMAIL_FROM, [email], msg.as_string())
-s.quit()
+if 'email' in fs:
+    email = fs.getfirst('email').strip()
+    if email:
+		msg = MIMEText(data)
+		msg['Subject'] = 'data from on-line experiment'
+		msg['From'] = EMAIL_FROM
+		msg['To'] = email
+		s = smtplib.SMTP(EMAIL_SMTP)
+		s.sendmail(EMAIL_FROM, [email], msg.as_string())
+		s.quit()
 
 import sys
 sys.write.stdout('some text')
