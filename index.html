@@ -1,134 +1,135 @@
-<!doctype html>
+<!DOCTYPE html>
+<!--
+Based on the code by Mark Wexler 
+-->
 <html>
 <head>
-<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-<meta content="utf-8" http-equiv="encoding">
+
 <script src="fullscreen.js"></script>
 <script>
 
-// uses a reference frame in which the origin is at the center, height is 2 (positive is up),
-// and width is proportional
+// INIT ------------------------------------------------
+// Get the JSON from the github URL
+var hashParams = window.location.hash.substr(1).split('&'); 
+var dir_url = hashParams[0];
+if(dir_url.split('.com')[0].includes('github')){
+	json_url = 'https://raw.githubusercontent.com'+ dir_url.split('.com')[1]
+	if(json_url.includes('tree/main')){
+		_ = json_url.split('tree/main')[0] + 'master' + json_url.split('tree/main')[1];
+		console.log(_);
+		json_url = _;
+	}
+}
 
-width_pix = 500;		// not real pixels, logical pixels (window height about 600 at any resolution)
-height_pix = 500;
-stimulus_duration = 0.5;	// seconds
-n_dots = 100;
-signal_fractions = [0.2, 0.4];
-n_repetitions = 10;
-speed = 0.05;			// distance units/sec, where 2 distance units = stimulus height, and frame rate assumed to be 60 Hz
-lifetime_frames = 12;	// in refresh calls, where usually 1 refresh call = 1 monitor refresh
-dot_radius = 0.01;		// distance units
-fp_radius = 0.02;		// distance units
-pause_duration = 0.5;	// seconds
-stimulus_color = "rgb(0, 0, 0)";
-fp_color = "rgb(255, 0, 0)";
-frame_rate = 60;		// assumed frame rate for distance calculation
 
+console.log('DEBUG : Found JSON url @ --> ' + json_url) 	// DEBUG
+
+let params  = ''
+fetch(json_url+'/config.json')
+.then(function(response) {
+return response.json();
+})
+.then(function(myJson) {
+params=myJson
+console.log('DEBUG : JSON params are --> ' + params) 		// DEBUG
+})
+
+// Init some extra parameters
+var windows_size = window.screen.availWidth;
+data_server = "http://lab-perception.org/js/savedata.py";
+// ------------------------------------------------ INIT
+
+
+
+// UTILS ------------------------------------------------
+// UTILS : Return the local time, used for reaction times
 function get_time()
 {
 	return (new Date()).getTime()/1000.0;
 }
 
-function polar2cart(r, theta)
-{
-	return [r*Math.cos(theta), r*Math.sin(theta)];
+// UTILS : Return a base64 image from an URL
+function getBase64FromImageUrl(url) {
+    var img = new Image();
+
+    img.setAttribute('crossOrigin', 'anonymous');
+
+    img.onload = function () {
+        var canvas = document.createElement("canvas");
+        canvas.width =this.width;
+        canvas.height =this.height;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(this, 0, 0);
+        var dataURL = canvas.toDataURL("image/png");
+    };
+    img.src = url;
+	return img ;
 }
 
-// returns random position inside unit disk, with uniform distribution
-function random_position()
-{
-	var r = Math.sqrt(Math.random());
-	var theta = 2*Math.PI*Math.random();
-	return polar2cart(r, theta);
-}
-
-function new_stimulus(trial)
-{
-	var n_signal_dots = Math.round(trial.signal_fraction*n_dots);
-	var n_noise_dots = n_dots - n_signal_dots;
-	var dots = new Array(n_dots);
-	for(var i = 0; i < n_dots; i++) {
-		var signal_direction = trial.direction == +1 ? 0 : Math.PI;
-		var ang = (i < n_signal_dots ? signal_direction : 2*Math.PI*(i - n_signal_dots)/n_signal_dots);
-		dots[i] = {pos0: random_position(),
-				   vel: polar2cart(speed, ang),
-				   frame: Math.floor(Math.random()*lifetime_frames)};
-	}
-	var n_frames = Math.round(stimulus_duration*frame_rate);
-	FRAME = new Array(n_frames);
-	for(var f = 0; f < n_frames; f++) {
-		var canvas = document.createElement("canvas");
-		canvas.width = width_pix;	// as opposed to buttons, you need to
-		canvas.height = height_pix;	// use canvas.width/height to set size
-		var context = canvas.getContext("2d");
-		context.translate(width_pix/2, height_pix/2);	// set a 'mathematical' reference frame, where (0,0) is the center,
-		context.scale(height_pix/2, -height_pix/2);		// (0,-1) bottom, (0,+1) top, (-W/H,0) left, and (+W/H,0) right
-		context.clearRect(-width/2, -height/2, width, height);
-		context.fillStyle = stimulus_color;
-		for(var i = 0; i < n_dots; i++) {
-			if(dots[i].frame >= lifetime_frames - 1) {	// if dot at the end of its lifetime, renew position
-				dots[i].frame = 0;
-				dots[i].pos0 = random_position();
-			}
-			var pos = dots[i].pos0;		// calculate current position
-			var t_dot = dots[i].frame/frame_rate;
-			for(var d = 0; d < 2; d++)
-				pos[d] += dots[i].vel[d]*t_dot;
-			if(pos[0]*pos[0] + pos[1]*pos[1] < 1) {		// display if inside unit disk
-				context.beginPath();
-				context.arc(pos[0], pos[1], dot_radius, 0, 2*Math.PI);
-				context.fill();
-			}
-			dots[i].frame++;		// in any case update frames for finite lifetime
-		}
-		context.fillStyle = fp_color;	// draw FP
-		context.beginPath();
-		context.arc(0, 0, fp_radius, 0, 2*Math.PI);
-		context.fill();
-		FRAME[f] = canvas;
-	}
-}
-
+// UTILS : Center an element of the document
 function center(elem)
 {
-	elem.style.padding = 0;
+	elem.style.padding = "0px";
 	elem.style.margin = "auto";
 	elem.style.display = "block";
 	elem.style.position = "absolute";
-	elem.style.top = elem.style.bottom = elem.style.left = elem.style.right = 0;
+	elem.style.top = elem.style.bottom = elem.style.left = elem.style.right = "0px";
 }
 
-// randomize array order in-place using Durstenfeld shuffle algorithm
+// UTILS : randomize array order in-place using Durstenfeld shuffle algorithm (unmodified from Mark Wexler)
 function shuffle_array(array)
 {
     for(var i = array.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random()*(i + 1));
+        var j = Math.floor(Math.random	()*(i + 1));
         var temp = array[i];
         array[i] = array[j];
         array[j] = temp;
     }
 }
 
+// UTILS : initialize the script state
 window.onload = function()
 {
 	state = "create form";
 	update();
 };
 
+// UTILS : put the stimulus in the FRAME object
+function new_stimulus(trial)
+{	
+	true_img_url = json_url + params['true_img_dir'] + '/' + trial.img_idx + '.' + params['img_ext'];
+	var true_img = getBase64FromImageUrl(true_img_url);
+	
+	ai_img_url = json_url + params['ai_img_dir'] + '/' + trial.img_idx + '.' + params['img_ext'];
+	var ai_img = getBase64FromImageUrl(ai_img_url);
+	
+	var correct_direction = Math.floor(Math.random() * (2) + 1)
+	var n_frames = Math.round(params['stimulus_duration']*params['frame_rate']);
+	FRAME = new Array(n_frames);
+	for(var f = 0; f < n_frames; f++) {
+		FRAME[f] = [true_img, ai_img, correct_direction];
+	}
+}
+// ------------------------------------------------ UTILS 
+
+
+
+
+// MAIN ------------------------------------------------
 function update()
 {
 	var keep_going = true;
 	if(state == "create form") {
 		form_table = document.createElement("table");
-		form_table.style.width = 500;
-		form_table.style.height = 150;
+		form_table.style.width = "500px";
+		form_table.style.height = "150px";
 		center(form_table);
 		var tbody = document.createElement("div");
 		var tr, td;
-
+		
 		tr = document.createElement("tr");
 		td = document.createElement("td");
-		td.appendChild(document.createTextNode("Subject:"));
+		td.appendChild(document.createTextNode("Subject ID (5 letters):"));
 		td.style.textAlign = "right";
 		tr.appendChild(td);
 		td = document.createElement("td");
@@ -136,7 +137,7 @@ function update()
 		td.appendChild(input_subj);
 		tr.appendChild(td);
 		tbody.appendChild(tr);
-
+		
 		tr = document.createElement("tr");
 		td = document.createElement("td");
 		td.appendChild(document.createTextNode("Age:"));
@@ -147,7 +148,18 @@ function update()
 		td.appendChild(input_age);
 		tr.appendChild(td);
 		tbody.appendChild(tr);
-
+		
+		tr = document.createElement("tr");
+		td = document.createElement("td");
+		td.appendChild(document.createTextNode("Email address to send the data (or blank):"));
+		td.style.textAlign = "right";
+		tr.appendChild(td);
+		td = document.createElement("td");
+		input_email = document.createElement("input");
+		td.appendChild(input_email);
+		tr.appendChild(td);
+		tbody.appendChild(tr);
+		
 		tr = document.createElement("tr");
 		tr.appendChild(document.createElement("td"));
 		td = document.createElement("td");
@@ -162,89 +174,114 @@ function update()
 		document.body.appendChild(form_table);
 		state = "wait for form";
 	}
+	
 	else if(state == "start experiment") {
 		subj_info = {};
 		subj_info.subject = input_subj.value;
 		subj_info.age = input_age.value;
-		subj_info.time = get_time(); // get  date
+		subj_info.email = input_email.value;
 		document.body.removeChild(form_table);
 		document.documentElement.requestFullscreen();
-
+		
 		trials = [];		// create factorial plan
-		for(var i_signal_fraction = 0; i_signal_fraction < signal_fractions.length; i_signal_fraction++)
-			for(var direction = -1; direction <= +1; direction += 2)
-				for(var i_repetition = 0; i_repetition < n_repetitions; i_repetition++)
-					trials.push({signal_fraction: signal_fractions[i_signal_fraction],
-								 direction: direction});
+		for(var i = 1; i <= params['n_images']; i++){
+			trials.push({img_idx : i});
+		}
 		shuffle_array(trials);	// randomize order of trials
+		console.log('DEBUG : Shuffled trials are --> ' + trials)  	// DEBUG
 		n_trial = 0;
-
-		canvas = document.createElement("canvas");		// create canvas for stimulus
-		canvas.width = width_pix;	// as opposed to buttons, you need to
-		canvas.height = height_pix;	// use canvas.width/height to set size
+		
+		canvas = document.createElement("canvas");							// create canvas for stimulus
+		canvas.width = window.devicePixelRatio*windows_size;			// the next four lines set the size and resolution
+		canvas.height = window.devicePixelRatio*params['height_pix'];		// the canvas; you need to scale .width and .height by
+		canvas.style.width = windows_size + "px";					// window.devicePixelRatio to get high resolution on
+		canvas.style.height = params['height_pix'] + "px";					// high pixel density monitors, but NOT .style.width/height
 		center(canvas);
 		var context = canvas.getContext("2d");
-		context.translate(width_pix/2, height_pix/2);	// set a 'mathematical' reference frame, where (0,0) is the center,
-		context.scale(height_pix/2, -height_pix/2);		// (0,-1) bottom, (0,+1) top, (-W/H,0) left, and (+W/H,0) right
-		height = 2.0;
-		width = (width_pix/height_pix)*height;
-		document.body.appendChild(canvas);
 
+		height = 2.0;
+		width = (windows_size/params['height_pix'])*height;
+		document.body.appendChild(canvas);
+		
 		instruction_text = document.createElement("div");
 		document.body.appendChild(instruction_text);
 		data_display_text = document.createElement("div");
 		document.body.appendChild(data_display_text);
-
+		
 		state = "begin trial";
 	}
-	else if(state == "begin trial") {		// initialize trial, start the wait for the go signal (space bar)
+	
+	else if(state == "begin trial") {				// initialize trial, start the wait for the go signal (space bar)
 		instruction_text.innerHTML = "<b>HIT SPACE BAR TO START TRIAL " + (n_trial + 1) + "/" + trials.length + "</b>";
 		trial = trials[n_trial];
 		new_stimulus(trial);
 		document.onkeydown = function(e) { if(e.keyCode == 32) state = "start motion"; };
 		state = "wait";
 	}
-	else if(state == "wait") {
+	
+	else if(state == "wait") {						// wait function for the begin trial state
 	}
-	else if(state == "start motion") {
+	
+	else if(state == "start motion") {				// initialize trial, start the wait for the go signal (space bar)
 		document.onkeydown = null;
 		instruction_text.innerHTML = "";
 		t0 = null;
 		n_frames = 0;
 		state = "motion";
 	}
-	else if(state == "motion") {	// display continuous RDK
+	
+	else if(state == "motion") {					// display images 
 		if(t0 === null) t0 = get_time();
 		var t = get_time() - t0;
-		var f = Math.round(t*frame_rate);
+		var f = Math.round(t*params['frame_rate']);
 		var context = canvas.getContext("2d");
 		context.clearRect(-width/2, -height/2, width, height);
 		if(f >= FRAME.length) {
+			context.clearRect(0, 0, windows_size*2, params['height_pix']*2);
 			state = "start response";
 		}
 		else {
 			context.save();
 			context.setTransform(1, 0, 0, 1, 0, 0);
-			context.drawImage(FRAME[f], 0, 0);
-			context.restore();
+			
+			var millieu = (window.devicePixelRatio*windows_size)/2;
+			
+			var offset = 10;
+			if(FRAME[f][2] == 1){
+				correct_img = FRAME[f][0];
+				context.drawImage(correct_img, millieu-512-(offset/2), 0);
+				false_img = FRAME[f][1];
+				context.drawImage(false_img, millieu+(offset/2), 0);
+			} else {
+				correct_img = FRAME[f][0];
+				context.drawImage(correct_img, millieu+(offset/2), 0);
+				false_img = FRAME[f][1];
+				context.drawImage(false_img, millieu-512-(offset/2), 0);
+			}
+			
 		}
 		n_frames++;
 	}
-	else if(state == "start response") {
+	
+	else if(state == "start response") {			// wait for the user's reply
+	
 		t0 = null;
 		instruction_text.innerHTML = "<b>LEFT OR RIGHT? RESPOND USING ARROWS</b>";
 		document.onkeydown = function(e) {
 			if(["ArrowLeft", "ArrowRight"].includes(e.key)) {
-				trial.response = (e.key == "ArrowLeft" ? -1 : +1);
+				trial.response = (e.key == "ArrowLeft" ? 1 : 2);
+				trial.direction = FRAME[0][2];
 				trial.rt = get_time() - t0;
 				state = "end trial";
 			}
 		};
 		state = "response";
 	}
+	
 	else if(state == "response") {
 		if(t0 === null) t0 = get_time();
 	}
+	
 	else if(state == "end trial") {
 		document.onkeydown = null;
 		instruction_text.innerHTML = "";
@@ -256,40 +293,96 @@ function update()
 		else
 			state = "end experiment";
 	}
+	
 	else if(state == "end experiment") {
 		// compile data into a text string that will be sent to the data server (and stored in a file, e.g.)
 		var data_text = [];
-		data_text.push(["SUBJECT", "AGE", "SIGNAL_FRACTION", "DIRECTION", "RESPONSE", "CORRECT", "RT"].join("\t"));
+		data_text.push(["SUBJECT", "AGE", "POS", "RESP", "CORR.?", "RT"].join("\t\t\t| "));
+		var name_subj = '';
+		if(subj_info.subject.length > 5){
+			name_subj = subj_info.subject.slice(0,5);
+		} else {
+		name_subj = subj_info.subject;
+		}
+		
+		var total_trues = 0;
+		var mean_rt = 0;
 		for(var i = 0; i < trials.length; i++) {
 			var tr = trials[i];
-			data_text.push([subj_info.subject, subj_info.age, tr.signal_fraction, tr.direction,
-							tr.response, (tr.correct ? 1 : 0), tr.rt].join("\t"));
+			data_text.push([name_subj, subj_info.age,
+							tr.direction, tr.response, (tr.correct ? 1 : 0), tr.rt.toFixed(3)].join("\t\t\t| "));
+			total_trues += (tr.correct ? 1 : 0);
+			mean_rt += tr.rt
 		}
+		data_text.push([' TOTAL CORRECT = ', (total_trues / params['n_images'])*100, '%', '\n',
+						'MEAN REACTION TIME = ', (mean_rt / params['n_images']).toFixed(3), 's'].join(' '));
 		data_text = data_text.join("\n");
-		data_text = data_text + "\n" ;
-
-		console.log(data_text);			// dump data to console for debugging purposes
+		console.log('DEBUG : Results are --> ' + data_text)  // DEBUG
+				
+				
 		instruction_text.innerHTML = "<b>Saved the data<b>";
 		data_display_text.innerHTML = "Data sent:<br><pre>" + data_text + "</pre>";
 
 		var request_text = "data=" + encodeURIComponent(data_text) + "&email=" + encodeURIComponent(subj_info.email);
 
-
 		var xmlhttp = new XMLHttpRequest();
-		xmlhttp.open("POST", "/oeil/json.php");
+		xmlhttp.open("POST", "./save.php");
 		xmlhttp.setRequestHeader("Content-Type", "application/text");
 		xmlhttp.send(data_text);
 		// xmlhttp.send(JSON.stringify({"subj_info" : subj_info, "trials" : trials}));
-
+		
 		document.exitFullscreen();
 		keep_going = false;
+		
+		/*
+		class JavascriptDataDownloader {
+			constructor(data={}) {
+				this.data = data;
+			}
+
+			download (type_of = "text/plain", filename= name_subj+'_'+subj_info.age+'_'+get_time()+"_data.txt") {
+				let body = document.body;
+				const a = document.createElement("a");
+				a.href = URL.createObjectURL(new Blob([JSON.stringify(this.data, null, 2)], {
+					type: type_of
+				}));
+				a.setAttribute("download", filename);
+				body.appendChild(a);
+				a.click();
+				body.removeChild(a);
+			}
+		} 
+		new JavascriptDataDownloader(trials).download();
+		*/
+		
+		/*
+		instruction_text.innerHTML = "<b>SENDING DATA TO " + data_server + "<b>";
+		data_display_text.innerHTML = "Data sent:<br><pre>" + data_text + "</pre>";
+		var request_text = "data=" + encodeURIComponent(data_text) + "&email=" + encodeURIComponent(subj_info.email);		
+		request = new XMLHttpRequest();	// make request a global variable, so that it can be accessed by the on_request_state_change function
+		request.open("POST", data_server, true);
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		//request.onreadystatechange = on_request_state_change;
+		request.send(request_text);		// this is the simplest way of sending an HTTP request
+										// however, occasionally internet requests get lost (typically 1%)
+										// the best thing would be to monitor the results of the request,
+										// and to retry if necessary (set onreadystatechange and ontimeout
+										// members to functions that will monitor the request and resubmit 
+										// if necessary)
+		instruction_text.innerHTML = "<b>DATA SENT TO " + data_server + "<b>";
+		
+		*/
 	}
+	
 	if(keep_going)
 		requestAnimationFrame(update);	// will call update on next frame (usually)
 }
+//  ------------------------------------------------ MAIN
+
 
 
 </script>
 </head>
 <body></body>
 </html>
+
